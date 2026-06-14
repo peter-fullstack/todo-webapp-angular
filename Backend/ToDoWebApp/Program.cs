@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ToDoWebApp.Data;
@@ -5,8 +6,15 @@ using ToDoWebApp.Features.ToDo;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddDbContext<ToDoDbContext>(options =>
+    options.UseInMemoryDatabase("TodoDb")); // In-memory Db for simplicity; replace with real DB in production
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddProblemDetails(); // RFC 7807 compliant errors
+
+// Scoped to the request - service uses Entity Framework
+builder.Services.AddScoped<IToDoService, ToDoService>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -19,6 +27,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Middleware to authenticate user based on a custom header (for demo purposes only - do NOT use in production!)
+// This will check and validate the "X-User-Id" header, verify the user exists in the database, and populate HttpContext.User accordingly.
 app.Use(async (context, next) =>
 {
     // 1. Check if the header is missing or completely un-parseable (Client Error = 400)
@@ -63,3 +73,5 @@ app.Use(async (context, next) =>
 app.MapTodoEndpoints();
 
 app.Run();
+
+public partial class Program { }

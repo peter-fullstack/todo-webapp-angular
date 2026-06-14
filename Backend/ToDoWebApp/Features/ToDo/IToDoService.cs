@@ -2,10 +2,10 @@
 {
     public interface IToDoService
     {
-        Task<ToDoDto> GetByIdForUserAsync(int userId, int todoId);
-        Task<IEnumerable<ToDoDto>> GetAllForUserAsync(int userId);
-        Task<ToDoDto> CreateForUserAsync(int userId, CreateToDoDto dto);
-        Task<ToDoDto> UpdateForUserAsync(UpdateToDoDto dto);
-        Task<ToDoDto> DeleteForUserAsync(int userId, int todoId);
+        Task<ToDoResponseDto> GetByIdForUserAsync(int userId, int todoId);
+        Task<IEnumerable<ToDoResponseDto>> GetToDosForUserAsync(int userId);
+        Task<ToDoResponseDto> CreateForUserAsync(int userId, CreateToDoRequestDto dto);
+        Task<ToDoResponseDto> UpdateForUserAsync(int userId, UpdateToDoRequestDto dto);
+        Task DeleteForUserAsync(int userId, int todoId);
     }
 }

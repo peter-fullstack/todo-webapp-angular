@@ -3,17 +3,17 @@ using ToDoWebApp.Extensions;
 
 namespace ToDoWebApp.Features.ToDo
 {
-    // Features/Todos/TodoEndpoints.cs
     public static class TodoEndpoints
     {
         public static void MapTodoEndpoints(this IEndpointRouteBuilder app)
         {
             var group = app.MapGroup("/api/todos").WithTags("Todos");
 
-            group.MapGet("/", GetAllTodos);
+            group.MapGet("/", GetAllToDosForUser);
             group.MapGet("/{toDoId}", GetTodo);
-            group.MapPost("/", CreateTodo);
-            group.MapPut("/", UpdateTodo);
+            group.MapPost("/", CreateTodo).AddEndpointFilter<ValidationFilter<CreateToDoRequestDto>>();
+            group.MapPut("/", UpdateTodo).AddEndpointFilter<ValidationFilter<UpdateToDoRequestDto>>();
+            group.MapDelete("/", DeleteTodo);
         }
 
         private static async Task<IResult> GetTodo(
@@ -27,33 +27,47 @@ namespace ToDoWebApp.Features.ToDo
             return TypedResults.Ok(todo);
         }
 
-        private static async Task<IResult> GetAllTodos(
+        private static async Task<IResult> GetAllToDosForUser(
             ClaimsPrincipal user,
             IToDoService todoService)
         {
             var userId = user.GetUserId();
-            var todos = await todoService.GetAllForUserAsync(userId);
+            var todos = await todoService.GetToDosForUserAsync(userId);
            
             return TypedResults.Ok(todos);
         }
 
         private static async Task<IResult> CreateTodo(
-            CreateToDoDto dto,
+            ClaimsPrincipal user,
+            CreateToDoRequestDto dto,
             IToDoService todoService)
         {
-            var userId = dto.UserId;
+            var userId = user.GetUserId();
             var result = await todoService.CreateForUserAsync(userId, dto);
             
             return TypedResults.Created($"/api/todos/{result.Id}", result);
         }
 
         private static async Task<IResult> UpdateTodo(
-            UpdateToDoDto dto,
+            ClaimsPrincipal user,
+            UpdateToDoRequestDto dto,
             IToDoService todoService)
         {
-            var result = await todoService.UpdateForUserAsync(dto);
+            var userId = user.GetUserId();
+            var result = await todoService.UpdateForUserAsync(userId, dto);
 
             return TypedResults.Ok(result);
+        }
+
+        private static async Task<IResult> DeleteTodo(
+            ClaimsPrincipal user,
+            int deleteToDoId,
+            IToDoService todoService)
+        {
+            var userId = user.GetUserId();
+
+            await todoService.DeleteForUserAsync(userId, deleteToDoId);
+            return TypedResults.Ok();
         }
     }
 }
