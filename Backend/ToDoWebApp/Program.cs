@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ToDoWebApp.Data;
 using ToDoWebApp.Features.ToDo;
+using ToDoWebApp.Filters;
+
+var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,16 +18,43 @@ builder.Services.AddProblemDetails(); // RFC 7807 compliant errors
 // Scoped to the request - service uses Entity Framework
 builder.Services.AddScoped<IToDoService, ToDoService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                .WithHeaders("Accept", "Content-Type", "Authorization", "X-User-Id")
+                .AllowAnyMethod(); // Required so OPTIONS and GET/POST are both allowed
+        });
+});
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Apply the header filter to all endpoints
+    options.OperationFilter<AddRequiredHeaderParameter>();
+});
 
 var app = builder.Build();
+
+app.UseRouting();
+
+app.UseCors(myAllowSpecificOrigins);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ToDoDbContext>();
+
+        // Ensure the InMemory database is initialized
+        context.Database.EnsureCreated();
+    }
 }
 
 // Middleware to authenticate user based on a custom header (for demo purposes only - do NOT use in production!)
