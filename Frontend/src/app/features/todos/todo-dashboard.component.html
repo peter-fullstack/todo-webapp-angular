@@ -1,0 +1,26 @@
+<!-- src/app/features/todos/todo-dashboard.component.html -->
+<div
+  class="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 font-sans antialiased text-slate-900"
+>
+  <div class="max-w-md mx-auto">
+    <!-- Session Simulation Panel -->
+    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm mb-6 transition-all">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-xl">👤</span>
+        <h3 class="text-sm font-semibold tracking-wide uppercase text-slate-500">
+          Session Context
+        </h3>
+      </div>
+      <div class="flex flex-col gap-2 sm:flex-row">
+        <app-user-dropdown></app-user-dropdown>          
+        <button
+          class="inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 shadow-sm transition-colors focus:outline-none"
+        >
+          Switch User
+        </button>
+      </div>
+    </div>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>

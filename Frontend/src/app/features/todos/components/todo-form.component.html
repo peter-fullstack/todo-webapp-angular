@@ -1,0 +1,56 @@
+<!-- features/todos/todo-form.component.html -->
+<div class="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 font-sans antialiased">
+  <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+    
+    <h2 class="text-2xl font-bold text-slate-800 mb-6">
+      {{ isEditMode ? 'Edit ToDo' : 'Create New ToDo' }}
+    </h2>
+
+    <form [formGroup]="todoForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      
+      <!-- Title Input -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">Title *</label>
+        <input 
+          type="text" 
+          formControlName="title"
+          placeholder="e.g., Finish job application task"
+          class="block w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          [ngClass]="{'border-red-500 focus:border-red-500 focus:ring-red-500': todoForm.get('title')?.touched && todoForm.get('title')?.invalid}"
+        />
+        <p *ngIf="todoForm.get('title')?.touched && todoForm.get('title')?.hasError('required')" class="mt-1 text-xs text-red-600">
+          Title is required.
+        </p>
+      </div>
+
+      <!-- Description Input -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">Description</label>
+        <textarea 
+          formControlName="description"
+          rows="4"
+          placeholder="Add some details about this task..."
+          class="block w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        ></textarea>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <a 
+          routerLink="/todos" 
+          class="inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50"
+        >
+          Cancel
+        </a>
+        <button 
+          type="submit" 
+          [disabled]="todoForm.invalid"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        >
+          Save Task
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

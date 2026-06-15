@@ -1,0 +1,13 @@
+<div class="todo-item-row" [class.completed]="todo().isCompleted">
+  <input type="checkbox" [checked]="todo().isCompleted" (change)="onToggleCompleted()" />
+
+  <span class="todo-title">{{ todo().title }}</span>
+
+  <a
+    routerLink="/todos/edit/{{ todo().id }}"
+    class="bg-indigo-600 text-white px-4 py-2 rounded-md font-medium text-sm"
+  >
+    Edit
+  </a>
+  <button class="btn-delete" (click)="delete.emit(todo().id)">X</button>
+</div>
